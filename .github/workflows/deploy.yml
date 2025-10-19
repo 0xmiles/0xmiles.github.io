@@ -1,0 +1,44 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NEXT_PUBLIC_SITE_URL: https://kyoongdev.github.io
+          NEXT_PUBLIC_SITE_NAME: KyoongDev Blog
+          NEXT_PUBLIC_SITE_DESCRIPTION: 개발자 kyoongdev의 기술 블로그
+          NEXT_PUBLIC_AUTHOR_NAME: kyoongdev
+          NEXT_PUBLIC_AUTHOR_EMAIL: 9898junjun2@gmail.com
+          NEXT_PUBLIC_GITHUB_URL: https://github.com/kyoongdev
+          NEXT_PUBLIC_LINKEDIN_URL: https://www.linkedin.com/in/yongjun-park-614280262/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
