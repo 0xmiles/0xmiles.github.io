@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 @layer base {
   :root {
@@ -56,7 +56,7 @@
   * {
     border-color: hsl(var(--border));
   }
-  
+
   body {
     @apply bg-background text-foreground;
   }
@@ -151,15 +151,58 @@
 
   /* 코드 블록 스타일 */
   .code-block {
-    @apply bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto;
+    @apply bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto relative;
+    font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas", monospace;
   }
 
   .inline-code {
-    @apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono;
+    @apply px-2 py-1 rounded text-sm font-mono;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .dark .inline-code {
-    @apply bg-gray-800 text-gray-200;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: #e2e8f0;
+    border: 1px solid #475569;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 코드 블록 헤더 */
+  .code-header {
+    @apply flex items-center justify-between bg-gray-800 text-gray-300 px-4 py-2 rounded-t-lg border-b border-gray-700;
+  }
+
+  .code-language {
+    @apply text-xs font-medium text-gray-400;
+  }
+
+  .copy-button {
+    @apply text-xs text-gray-400 hover:text-gray-200 transition-colors cursor-pointer;
+  }
+
+  /* 하이라이트된 라인 */
+  .highlighted {
+    @apply bg-yellow-200 dark:bg-yellow-900/30;
+  }
+
+  /* 코드 블록 스크롤바 */
+  .code-block::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .code-block::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+
+  .code-block::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+  }
+
+  .code-block::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
   }
 }
 
@@ -169,10 +212,571 @@
   }
 }
 
-/* Prism.js 테마 커스터마이징 */
+/* 코드 블록 컨테이너 */
+.code-block-container {
+  @apply relative my-6 rounded-lg border shadow-lg overflow-hidden;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  border: 1px solid #2a2a3e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* 💻 Code block - 기본 스타일 */
+
+/* Shiki 테마 스타일 */
+.shiki {
+  @apply relative;
+  background: transparent !important;
+}
+
+/* One Dark Pro 테마 (다크모드) */
+.dark .shiki {
+  background: #282c34 !important;
+  color: #abb2bf !important;
+}
+
+/* One Light 테마 (라이트모드) */
+.shiki:not(.dark) {
+  background: #fafafa !important;
+  color: #383a42 !important;
+}
+
+/* 코드 블록 내부 스타일 개선 */
+.code-block-container .code-content {
+  @apply p-6 overflow-x-auto;
+  font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  background: transparent;
+}
+
+.code-block-container .code-content pre {
+  @apply m-0 p-0 bg-transparent;
+  background: transparent !important;
+}
+
+.code-block-container .code-content code {
+  @apply block;
+  background: transparent !important;
+  color: inherit;
+  padding: 0;
+}
+
+/* Shiki 토큰 스타일 */
+.shiki .token.comment {
+  color: #5c6370 !important;
+  font-style: italic;
+}
+
+.shiki .token.keyword {
+  color: #c678dd !important;
+  font-weight: 600;
+}
+
+.shiki .token.string {
+  color: #98c379 !important;
+}
+
+.shiki .token.number {
+  color: #d19a66 !important;
+}
+
+.shiki .token.function {
+  color: #61afef !important;
+  font-weight: 600;
+}
+
+.shiki .token.class-name {
+  color: #e5c07b !important;
+  font-weight: 600;
+}
+
+.shiki .token.operator {
+  color: #56b6c2 !important;
+}
+
+.shiki .token.punctuation {
+  color: #abb2bf !important;
+}
+
+.shiki .token.variable {
+  color: #e06c75 !important;
+}
+
+.shiki .token.constant {
+  color: #d19a66 !important;
+}
+
+.shiki .token.property {
+  color: #e06c75 !important;
+}
+
+.shiki .token.boolean {
+  color: #d19a66 !important;
+}
+
+.shiki .token.regex {
+  color: #98c379 !important;
+}
+
+.shiki .token.tag {
+  color: #e06c75 !important;
+}
+
+.shiki .token.attr-name {
+  color: #d19a66 !important;
+}
+
+.shiki .token.attr-value {
+  color: #98c379 !important;
+}
+
+/* 라이트모드 Shiki 스타일 */
+.shiki:not(.dark) .token.comment {
+  color: #a0a1a7 !important;
+  font-style: italic;
+}
+
+.shiki:not(.dark) .token.keyword {
+  color: #a626a4 !important;
+  font-weight: 600;
+}
+
+.shiki:not(.dark) .token.string {
+  color: #50a14f !important;
+}
+
+.shiki:not(.dark) .token.number {
+  color: #986801 !important;
+}
+
+.shiki:not(.dark) .token.function {
+  color: #4078f2 !important;
+  font-weight: 600;
+}
+
+.shiki:not(.dark) .token.class-name {
+  color: #c18401 !important;
+  font-weight: 600;
+}
+
+.shiki:not(.dark) .token.operator {
+  color: #0184bc !important;
+}
+
+.shiki:not(.dark) .token.punctuation {
+  color: #383a42 !important;
+}
+
+.shiki:not(.dark) .token.variable {
+  color: #e45649 !important;
+}
+
+.shiki:not(.dark) .token.constant {
+  color: #986801 !important;
+}
+
+.shiki:not(.dark) .token.property {
+  color: #e45649 !important;
+}
+
+.shiki:not(.dark) .token.boolean {
+  color: #986801 !important;
+}
+
+.shiki:not(.dark) .token.regex {
+  color: #50a14f !important;
+}
+
+.shiki:not(.dark) .token.tag {
+  color: #e45649 !important;
+}
+
+.shiki:not(.dark) .token.attr-name {
+  color: #986801 !important;
+}
+
+.shiki:not(.dark) .token.attr-value {
+  color: #50a14f !important;
+}
+
+.code-block-container .code-header {
+  @apply flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700;
+}
+
+.code-block-container .language-label {
+  @apply px-3 py-1 text-xs rounded-full font-medium bg-gray-700 text-gray-300 uppercase tracking-wide;
+}
+
+.code-block-container .copy-button {
+  @apply p-2 rounded hover:bg-gray-700 transition-colors text-gray-400 hover:text-white;
+}
+
+.code-block-container .code-content {
+  @apply p-6 overflow-x-auto;
+  font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #e4e4e7;
+  background: transparent;
+}
+
+.code-block-container .code-content code {
+  @apply block;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+/* 다크모드 */
+.dark .code-block-container {
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  border: 1px solid #2a2a3e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dark .code-block-container .code-content {
+  color: #e4e4e7;
+}
+
+/* 라이트모드 */
+.code-block-container:not(.dark) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.code-block-container:not(.dark) .code-content {
+  color: #1e293b;
+}
+
+.code-block-container:not(.dark) .language-label {
+  @apply bg-gray-200 text-gray-600;
+}
+
+.code-block-container:not(.dark) .code-header {
+  @apply bg-gray-100 border-gray-300;
+}
+
+/* 코드 블록 기본 스타일 */
 code[class*="language-"],
 pre[class*="language-"] {
   @apply text-sm;
+  font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas", monospace;
+}
+
+/* 간단한 구문 강조 색상 */
+.language-javascript .token.keyword,
+.language-typescript .token.keyword,
+.language-jsx .token.keyword,
+.language-tsx .token.keyword {
+  color: #ff79c6;
+  font-weight: 600;
+}
+
+.language-javascript .token.string,
+.language-typescript .token.string,
+.language-jsx .token.string,
+.language-tsx .token.string {
+  color: #f1fa8c;
+}
+
+.language-javascript .token.comment,
+.language-typescript .token.comment,
+.language-jsx .token.comment,
+.language-tsx .token.comment {
+  color: #6272a4;
+  font-style: italic;
+}
+
+.language-javascript .token.number,
+.language-typescript .token.number,
+.language-jsx .token.number,
+.language-tsx .token.number {
+  color: #bd93f9;
+}
+
+.language-javascript .token.function,
+.language-typescript .token.function,
+.language-jsx .token.function,
+.language-tsx .token.function {
+  color: #8be9fd;
+  font-weight: 600;
+}
+
+.language-javascript .token.class-name,
+.language-typescript .token.class-name,
+.language-jsx .token.class-name,
+.language-tsx .token.class-name {
+  color: #ffb86c;
+  font-weight: 600;
+}
+
+.language-javascript .token.operator,
+.language-typescript .token.operator,
+.language-jsx .token.operator,
+.language-tsx .token.operator {
+  color: #ff79c6;
+}
+
+.language-javascript .token.punctuation,
+.language-typescript .token.punctuation,
+.language-jsx .token.punctuation,
+.language-tsx .token.punctuation {
+  color: #e4e4e7;
+}
+
+/* 코드 블록 기본 스타일 */
+pre {
+  @apply relative rounded-lg border shadow-lg;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+  border: 1px solid #3a3a5c;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+pre code {
+  @apply block p-6 overflow-x-auto;
+  font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #e4e4e7;
+}
+
+/* 언어 라벨 */
+pre::before {
+  content: attr(data-language);
+  @apply absolute top-3 right-3 px-3 py-1 text-xs rounded-full font-medium;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+pre:hover::after {
+  @apply opacity-100;
+}
+
+/* 복사 버튼 클릭 효과 */
+pre::after:active {
+  @apply scale-95;
+}
+
+/* 다크모드 코드 블록 */
+.dark pre {
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  border: 1px solid #2a2a3e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dark pre code {
+  color: #e4e4e7;
+}
+
+.dark pre::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+/* 라이트모드 코드 블록 */
+pre:not(.dark) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+pre:not(.dark) code {
+  color: #1e293b;
+}
+
+pre:not(.dark)::before {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: white;
+}
+
+/* 라이트모드 구문 강조 */
+pre:not(.dark) .hljs {
+  background: transparent !important;
+  color: #1e293b !important;
+}
+
+pre:not(.dark) .hljs-keyword,
+pre:not(.dark) .hljs-selector-tag,
+pre:not(.dark) .hljs-literal,
+pre:not(.dark) .hljs-section,
+pre:not(.dark) .hljs-link,
+pre:not(.dark) .hljs-built_in,
+pre:not(.dark) .hljs-type {
+  color: #d73a49 !important;
+  font-weight: 600;
+}
+
+pre:not(.dark) .hljs-string,
+pre:not(.dark) .hljs-title,
+pre:not(.dark) .hljs-name,
+pre:not(.dark) .hljs-attribute,
+pre:not(.dark) .hljs-symbol,
+pre:not(.dark) .hljs-bullet,
+pre:not(.dark) .hljs-addition,
+pre:not(.dark) .hljs-char,
+pre:not(.dark) .hljs-template-string {
+  color: #032f62 !important;
+}
+
+pre:not(.dark) .hljs-comment,
+pre:not(.dark) .hljs-quote,
+pre:not(.dark) .hljs-deletion,
+pre:not(.dark) .hljs-meta {
+  color: #6a737d !important;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+pre:not(.dark) .hljs-number,
+pre:not(.dark) .hljs-regexp,
+pre:not(.dark) .hljs-literal,
+pre:not(.dark) .hljs-constant {
+  color: #005cc5 !important;
+  font-weight: 500;
+}
+
+pre:not(.dark) .hljs-variable,
+pre:not(.dark) .hljs-template-variable,
+pre:not(.dark) .hljs-attribute,
+pre:not(.dark) .hljs-params {
+  color: #e36209 !important;
+}
+
+pre:not(.dark) .hljs-function,
+pre:not(.dark) .hljs-title.function_,
+pre:not(.dark) .hljs-title.method {
+  color: #6f42c1 !important;
+  font-weight: 600;
+}
+
+pre:not(.dark) .hljs-class,
+pre:not(.dark) .hljs-title.class_,
+pre:not(.dark) .hljs-title {
+  color: #d73a49 !important;
+  font-weight: 600;
+}
+
+pre:not(.dark) .hljs-tag,
+pre:not(.dark) .hljs-tag .hljs-name {
+  color: #22863a !important;
+}
+
+pre:not(.dark) .hljs-attr,
+pre:not(.dark) .hljs-property {
+  color: #e36209 !important;
+}
+
+pre:not(.dark) .hljs-value,
+pre:not(.dark) .hljs-string .hljs-value {
+  color: #032f62 !important;
+}
+
+pre:not(.dark) .hljs-operator {
+  color: #d73a49 !important;
+  font-weight: 600;
+}
+
+pre:not(.dark) .hljs-punctuation {
+  color: #1e293b !important;
+}
+
+/* Prism.js 추가 스타일 */
+.token.variable,
+.token.template-variable,
+.token.strong,
+.token.emphasis {
+  color: #a6e22e;
+}
+
+.token.parameter {
+  color: #fd971f;
+}
+
+.token.literal,
+.token.number,
+.token.boolean {
+  color: #ae81ff;
+}
+
+.token.string,
+.token.char {
+  color: #e6db74;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.token.variable {
+  color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #f92672;
+}
+
+.token.function,
+.token.class-name {
+  color: #a6e22e;
+}
+
+.token.regex,
+.token.important {
+  color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+/* 하이라이트된 라인 */
+.highlighted {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 121, 198, 0.1) 0%,
+    rgba(255, 121, 198, 0.05) 100%
+  ) !important;
+  border-left: 3px solid #ff79c6;
+  padding-left: 8px;
+}
+
+/* 라인 번호 스타일 */
+.line-numbers {
+  @apply text-gray-500 mr-4 select-none;
+  font-size: 0.75rem;
+}
+
+/* 코드 블록 스크롤바 */
+pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #5a67d8 0%, #6b46c1 100%);
 }
 
 /* 마크다운 콘텐츠 스타일 */
@@ -200,7 +804,8 @@ pre[class*="language-"] {
   @apply text-gray-700 dark:text-gray-300 mb-4 leading-relaxed;
 }
 
-.prose ul, .prose ol {
+.prose ul,
+.prose ol {
   @apply mb-4 pl-6;
 }
 
@@ -217,11 +822,88 @@ pre[class*="language-"] {
 }
 
 .prose pre {
-  @apply code-block my-6;
+  @apply my-6 relative rounded-lg border shadow-lg;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+  border: 1px solid #3a3a5c;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .prose pre code {
-  @apply bg-transparent text-inherit p-0;
+  @apply bg-transparent text-inherit p-6 block overflow-x-auto;
+  font-family: "JetBrains Mono", "Fira Code", "Monaco", "Consolas", monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: #e4e4e7;
+}
+
+/* 코드 블록 내부 스타일 */
+.prose pre[data-theme="light"] {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.prose pre[data-theme="light"] code {
+  color: #1e293b;
+}
+
+.prose pre[data-theme="dark"] {
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  border: 1px solid #2a2a3e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.prose pre[data-theme="dark"] code {
+  color: #e4e4e7;
+}
+
+/* 라인 번호 스타일 */
+.prose pre .line {
+  @apply block min-h-[1.5rem];
+}
+
+.prose pre .line-number {
+  @apply inline-block w-8 text-right text-gray-500 mr-4 select-none;
+  font-size: 0.75rem;
+}
+
+/* 하이라이트된 라인 */
+.prose pre .line.highlighted {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 121, 198, 0.1) 0%,
+    rgba(255, 121, 198, 0.05) 100%
+  ) !important;
+  border-left: 3px solid #ff79c6;
+  padding-left: 8px;
+}
+
+/* 코드 블록 헤더 */
+.prose pre::before {
+  content: attr(data-language);
+  @apply absolute top-3 right-3 px-3 py-1 text-xs rounded-full font-medium;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 복사 버튼 */
+.prose pre::after {
+  content: "📋";
+  @apply absolute top-3 right-16 cursor-pointer opacity-0 transition-all duration-200 text-gray-400 hover:text-white;
+  z-index: 10;
+  font-size: 0.875rem;
+}
+
+.prose pre:hover::after {
+  @apply opacity-100;
+}
+
+/* 복사 버튼 클릭 효과 */
+.prose pre::after:active {
+  @apply scale-95;
 }
 
 .prose img {
@@ -232,7 +914,8 @@ pre[class*="language-"] {
   @apply w-full border-collapse border border-gray-300 dark:border-gray-600 my-6;
 }
 
-.prose th, .prose td {
+.prose th,
+.prose td {
   @apply border border-gray-300 dark:border-gray-600 px-4 py-2 text-left;
 }
 
@@ -258,5 +941,401 @@ pre[class*="language-"] {
 
 /* 다크모드 전환 애니메이션 */
 * {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* ===== react-notion-x 커스텀 스타일 ===== */
+
+/* Notion 컨테이너 기본 스타일 */
+.notion-container {
+  @apply w-full;
+}
+
+/* Notion 페이지 스타일 */
+.notion-page {
+  @apply max-w-none;
+}
+
+/* Notion 헤더 스타일 */
+.notion-h1 {
+  @apply text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 mt-8;
+}
+
+.notion-h2 {
+  @apply text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-4 mt-6;
+}
+
+.notion-h3 {
+  @apply text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-3 mt-5;
+}
+
+.notion-h4 {
+  @apply text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 mt-4;
+}
+
+.notion-h5 {
+  @apply text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 mt-3;
+}
+
+.notion-h6 {
+  @apply text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 mt-3;
+}
+
+/* Notion 텍스트 스타일 */
+.notion-text {
+  @apply text-gray-700 dark:text-gray-300 leading-relaxed;
+}
+
+.notion-p {
+  @apply mb-4 text-gray-700 dark:text-gray-300 leading-relaxed;
+}
+
+/* Notion 리스트 스타일 */
+.notion-list {
+  @apply mb-4;
+}
+
+.notion-list-item {
+  @apply mb-2 text-gray-700 dark:text-gray-300;
+}
+
+.notion-bulleted-list {
+  @apply pl-6 mb-4;
+}
+
+.notion-numbered-list {
+  @apply pl-6 mb-4;
+}
+
+/* Notion 인라인 코드 스타일 */
+.notion-inline-code {
+  @apply px-2 py-1 rounded text-sm font-mono;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .notion-inline-code {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Notion 인용구 스타일 */
+.notion-quote {
+  @apply border-l-4 border-primary pl-4 italic text-gray-600 dark:text-gray-400 my-6;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.dark .notion-quote {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+}
+
+/* Notion 구분선 스타일 */
+.notion-hr {
+  @apply my-8 border-t border-gray-300 dark:border-gray-600;
+}
+
+/* Notion 이미지 스타일 */
+.notion-image-container {
+  @apply my-6;
+}
+
+.notion-image {
+  @apply rounded-lg shadow-md w-full;
+  max-width: 100%;
+  height: auto;
+}
+
+.notion-image-caption {
+  @apply text-sm text-gray-500 dark:text-gray-400 mt-2 text-center italic;
+}
+
+/* Notion 테이블 스타일 */
+.notion-table {
+  @apply w-full border-collapse border border-gray-300 dark:border-gray-600 my-6 rounded-lg overflow-hidden;
+}
+
+.notion-th,
+.notion-td {
+  @apply border border-gray-300 dark:border-gray-600 px-4 py-2 text-left;
+}
+
+.notion-th {
+  @apply bg-gray-100 dark:bg-gray-800 font-semibold;
+}
+
+/* Notion 토글 스타일 */
+.notion-toggle {
+  @apply mb-4;
+}
+
+.notion-toggle-summary {
+  @apply cursor-pointer font-semibold text-gray-900 dark:text-gray-100 mb-2;
+}
+
+.notion-toggle-details {
+  @apply pl-4 border-l-2 border-gray-200 dark:border-gray-700;
+}
+
+/* Notion 콜아웃 스타일 */
+.notion-callout {
+  @apply p-4 rounded-lg border-l-4 my-4;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left-color: #0ea5e9;
+}
+
+.dark .notion-callout {
+  background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+  border-left-color: #0ea5e9;
+}
+
+.notion-callout-icon {
+  @apply text-2xl mr-3;
+}
+
+.notion-callout-text {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+/* Notion 컬럼 스타일 */
+.notion-column {
+  @apply flex flex-col gap-4;
+}
+
+.notion-column-list {
+  @apply flex gap-6;
+}
+
+/* Notion 임베드 스타일 */
+.notion-embed {
+  @apply my-6 rounded-lg overflow-hidden shadow-lg;
+}
+
+/* Notion 비디오 스타일 */
+.notion-video-container {
+  @apply my-6;
+}
+
+.notion-video {
+  @apply rounded-lg overflow-hidden shadow-lg w-full;
+}
+
+/* Notion 파일 스타일 */
+.notion-file {
+  @apply p-4 border rounded-lg my-4 bg-gray-50 dark:bg-gray-800;
+}
+
+.notion-file-icon {
+  @apply text-2xl mr-3;
+}
+
+.notion-file-name {
+  @apply font-semibold text-gray-900 dark:text-gray-100;
+}
+
+/* Notion 수식 스타일 */
+.notion-equation {
+  @apply my-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg;
+  font-family: "KaTeX_Main", "Times New Roman", serif;
+}
+
+/* Notion 토글 목록 스타일 */
+.notion-toggle-list {
+  @apply space-y-2;
+}
+
+/* Notion 체크박스 스타일 */
+.notion-checkbox {
+  @apply mr-2;
+}
+
+.notion-checkbox-checked {
+  @apply text-green-600 dark:text-green-400;
+}
+
+/* Notion 링크 스타일 */
+.notion-link {
+  @apply text-primary hover:text-primary/80 underline-offset-4 hover:underline;
+}
+
+/* Notion 강조 스타일 */
+.notion-bold {
+  @apply font-bold;
+}
+
+.notion-italic {
+  @apply italic;
+}
+
+.notion-strikethrough {
+  @apply line-through;
+}
+
+.notion-underline {
+  @apply underline;
+}
+
+.notion-code {
+  @apply notion-inline-code;
+}
+
+/* Notion 색상 스타일 */
+.notion-red {
+  @apply text-red-600 dark:text-red-400;
+}
+
+.notion-orange {
+  @apply text-orange-600 dark:text-orange-400;
+}
+
+.notion-yellow {
+  @apply text-yellow-600 dark:text-yellow-400;
+}
+
+.notion-green {
+  @apply text-green-600 dark:text-green-400;
+}
+
+.notion-blue {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+.notion-purple {
+  @apply text-purple-600 dark:text-purple-400;
+}
+
+.notion-pink {
+  @apply text-pink-600 dark:text-pink-400;
+}
+
+.notion-brown {
+  @apply text-amber-600 dark:text-amber-400;
+}
+
+.notion-gray {
+  @apply text-gray-600 dark:text-gray-400;
+}
+
+/* Notion 배경 색상 스타일 */
+.notion-bg-red {
+  @apply bg-red-50 dark:bg-red-900/20;
+}
+
+.notion-bg-orange {
+  @apply bg-orange-50 dark:bg-orange-900/20;
+}
+
+.notion-bg-yellow {
+  @apply bg-yellow-50 dark:bg-yellow-900/20;
+}
+
+.notion-bg-green {
+  @apply bg-green-50 dark:bg-green-900/20;
+}
+
+.notion-bg-blue {
+  @apply bg-blue-50 dark:bg-blue-900/20;
+}
+
+.notion-bg-purple {
+  @apply bg-purple-50 dark:bg-purple-900/20;
+}
+
+.notion-bg-pink {
+  @apply bg-pink-50 dark:bg-pink-900/20;
+}
+
+.notion-bg-brown {
+  @apply bg-amber-50 dark:bg-amber-900/20;
+}
+
+.notion-bg-gray {
+  @apply bg-gray-50 dark:bg-gray-800;
+}
+
+/* Notion 컬렉션 스타일 */
+.notion-collection {
+  @apply my-6 border rounded-lg overflow-hidden;
+}
+
+.notion-collection-header {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 border-b;
+}
+
+.notion-collection-title {
+  @apply text-lg font-semibold text-gray-900 dark:text-gray-100;
+}
+
+.notion-collection-content {
+  @apply p-4;
+}
+
+/* Notion 페이지 링크 스타일 */
+.notion-page-link {
+  @apply inline-flex items-center gap-2 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors;
+}
+
+.notion-page-link-icon {
+  @apply text-2xl;
+}
+
+.notion-page-link-title {
+  @apply font-medium text-gray-900 dark:text-gray-100;
+}
+
+/* Notion 데이터베이스 스타일 */
+.notion-database {
+  @apply my-6 border rounded-lg overflow-hidden;
+}
+
+.notion-database-header {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 border-b;
+}
+
+.notion-database-title {
+  @apply text-lg font-semibold text-gray-900 dark:text-gray-100;
+}
+
+.notion-database-content {
+  @apply p-4;
+}
+
+/* Notion 댓글 스타일 */
+.notion-comment {
+  @apply p-4 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 my-4 rounded-r-lg;
+}
+
+.notion-comment-author {
+  @apply font-semibold text-gray-900 dark:text-gray-100 mb-2;
+}
+
+.notion-comment-text {
+  @apply text-gray-700 dark:text-gray-300;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .notion-column-list {
+    @apply flex-col;
+  }
+  
+  .notion-table {
+    @apply text-sm;
+  }
+  
+  .notion-th,
+  .notion-td {
+    @apply px-2 py-1;
+  }
+}
+
+/* 애니메이션 */
+.notion-container * {
+  transition: all 0.2s ease;
 }

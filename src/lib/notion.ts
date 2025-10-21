@@ -1,13 +1,48 @@
-import { Client } from "@notionhq/client";
-import { BlogPost, BlogCategory, BlogTag, NotionPage } from "@/types/blog";
+import { NotionAPI } from "notion-client";
+import { BlogPost, BlogCategory, BlogTag } from "@/types/blog";
+import { ExtendedRecordMap } from "notion-types";
 
-const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
+// Notion API 클라이언트 초기화
+const notionClient = new NotionAPI({
+  authToken: process.env.NOTION_TOKEN,
 });
-console.log(process.env.NOTION_API_KEY);
-console.log(process.env.NOTION_DATABASE_ID);
 
-const DATABASE_ID = process.env.NOTION_DATABASE_ID || "";
+// Notion 데이터베이스 ID (환경 변수에서 가져오기)
+const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
+
+// 데이터베이스 속성 확인 함수 (디버깅용)
+export async function getDatabaseProperties() {
+  try {
+    if (!process.env.NOTION_TOKEN || !NOTION_DATABASE_ID) {
+      return null;
+    }
+
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
+          "Content-Type": "application/json",
+          "Notion-Version": "2022-06-28",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Database properties error:", response.status, errorData);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log("Database properties:", Object.keys(data.properties));
+    return data.properties;
+  } catch (error) {
+    console.error("Error fetching database properties:", error);
+    return null;
+  }
+}
 
 // Notion 페이지를 블로그 포스트로 변환
 function transformNotionPageToBlogPost(page: any): BlogPost {
@@ -19,9 +54,12 @@ function transformNotionPageToBlogPost(page: any): BlogPost {
     properties.Name?.title?.[0]?.plain_text ||
     "Untitled";
 
+  // 다양한 속성 이름에서 slug 찾기
   const slug =
     properties.Slug?.rich_text?.[0]?.plain_text ||
     properties.URL?.rich_text?.[0]?.plain_text ||
+    properties.Slug?.title?.[0]?.plain_text ||
+    properties.URL?.title?.[0]?.plain_text ||
     title
       .toLowerCase()
       .replace(/\s+/g, "-")
@@ -61,7 +99,7 @@ function transformNotionPageToBlogPost(page: any): BlogPost {
     id: page.id,
     title,
     slug,
-    content: "", // 별도로 블록을 가져와야 함
+    content: "", // RecordMap에서 가져올 예정
     excerpt,
     category,
     tags,
@@ -77,279 +115,98 @@ function transformNotionPageToBlogPost(page: any): BlogPost {
   };
 }
 
-// Notion 블록을 마크다운으로 변환
-async function convertNotionBlocksToMarkdown(blocks: any[]): Promise<string> {
-  let markdown = "";
-
-  for (const block of blocks) {
-    switch (block.type) {
-      case "paragraph":
-        if (block.paragraph.rich_text.length > 0) {
-          markdown +=
-            block.paragraph.rich_text
-              .map((text: any) => text.plain_text)
-              .join("") + "\n\n";
-        } else {
-          markdown += "\n";
-        }
-        break;
-
-      case "heading_1":
-        markdown += `# ${block.heading_1.rich_text
-          .map((text: any) => text.plain_text)
-          .join("")}\n\n`;
-        break;
-
-      case "heading_2":
-        markdown += `## ${block.heading_2.rich_text
-          .map((text: any) => text.plain_text)
-          .join("")}\n\n`;
-        break;
-
-      case "heading_3":
-        markdown += `### ${block.heading_3.rich_text
-          .map((text: any) => text.plain_text)
-          .join("")}\n\n`;
-        break;
-
-      case "bulleted_list_item":
-        markdown += `- ${block.bulleted_list_item.rich_text
-          .map((text: any) => text.plain_text)
-          .join("")}\n`;
-        break;
-
-      case "numbered_list_item":
-        markdown += `1. ${block.numbered_list_item.rich_text
-          .map((text: any) => text.plain_text)
-          .join("")}\n`;
-        break;
-
-      case "code":
-        const language = block.code.language;
-        const code = block.code.rich_text
-          .map((text: any) => text.plain_text)
-          .join("");
-        markdown += `\`\`\`${language}\n${code}\n\`\`\`\n\n`;
-        break;
-
-      case "quote":
-        markdown += `> ${block.quote.rich_text
-          .map((text: any) => text.plain_text)
-          .join("")}\n\n`;
-        break;
-
-      case "divider":
-        markdown += "---\n\n";
-        break;
-
-      case "image":
-        if (block.image.type === "external") {
-          markdown += `![${block.image.caption?.[0]?.plain_text || ""}](${
-            block.image.external.url
-          })\n\n`;
-        } else if (block.image.type === "file") {
-          markdown += `![${block.image.caption?.[0]?.plain_text || ""}](${
-            block.image.file.url
-          })\n\n`;
-        }
-        break;
-
-      default:
-        // 지원하지 않는 블록 타입은 무시
-        break;
-    }
-  }
-
-  return markdown;
-}
-
-// 더미 데이터 생성
-function createDummyPosts(): BlogPost[] {
-  return [
-    {
-      id: "dummy-1",
-      title: "Next.js 14 App Router 완벽 가이드",
-      slug: "nextjs-14-app-router-guide",
-      content:
-        "# Next.js 14 App Router\n\nNext.js 14의 새로운 App Router에 대해 알아보겠습니다.\n\n## 주요 특징\n\n- 서버 컴포넌트 지원\n- 향상된 성능\n- 더 나은 개발자 경험",
-      excerpt:
-        "Next.js 14의 새로운 App Router의 주요 특징과 사용법을 알아보세요.",
-      category: "Frontend",
-      tags: ["Next.js", "React", "JavaScript"],
-      publishedAt: "2024-01-15",
-      updatedAt: "2024-01-15",
-      coverImage:
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop",
-      author: {
-        name: "kyoongdev",
-        email: "9898junjun2@gmail.com",
-      },
-      readingTime: 5,
-      isPublished: true,
-    },
-    {
-      id: "dummy-2",
-      title: "TypeScript로 더 안전한 코드 작성하기",
-      slug: "typescript-safe-coding",
-      content:
-        "# TypeScript로 더 안전한 코드 작성하기\n\nTypeScript의 타입 시스템을 활용하여 더 안전하고 유지보수하기 쉬운 코드를 작성하는 방법을 알아보겠습니다.",
-      excerpt:
-        "TypeScript의 타입 시스템을 활용한 안전한 코딩 방법을 소개합니다.",
-      category: "Programming",
-      tags: ["TypeScript", "JavaScript", "Programming"],
-      publishedAt: "2024-01-10",
-      updatedAt: "2024-01-10",
-      coverImage:
-        "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&h=400&fit=crop",
-      author: {
-        name: "kyoongdev",
-        email: "9898junjun2@gmail.com",
-      },
-      readingTime: 8,
-      isPublished: true,
-    },
-    {
-      id: "dummy-3",
-      title: "Tailwind CSS로 빠른 스타일링하기",
-      slug: "tailwind-css-fast-styling",
-      content:
-        "# Tailwind CSS로 빠른 스타일링하기\n\nTailwind CSS를 사용하여 빠르고 효율적으로 스타일링하는 방법을 알아보겠습니다.",
-      excerpt:
-        "Tailwind CSS의 유틸리티 클래스를 활용한 빠른 스타일링 방법을 소개합니다.",
-      category: "Frontend",
-      tags: ["Tailwind CSS", "CSS", "Styling"],
-      publishedAt: "2024-01-05",
-      updatedAt: "2024-01-05",
-      coverImage:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop",
-      author: {
-        name: "kyoongdev",
-        email: "9898junjun2@gmail.com",
-      },
-      readingTime: 6,
-      isPublished: true,
-    },
-  ];
-}
-
 // 모든 블로그 포스트 가져오기
 export async function getAllPosts(): Promise<BlogPost[]> {
   try {
-    // Notion API 키나 데이터베이스 ID가 없으면 더미 데이터 반환
-    if (!process.env.NOTION_API_KEY || !DATABASE_ID) {
-      console.log("Notion API 설정이 없어 더미 데이터를 사용합니다.");
-      return createDummyPosts();
+    // 환경 변수가 없으면 빈 배열 반환
+    if (!process.env.NOTION_TOKEN || !NOTION_DATABASE_ID) {
+      console.log("Notion API 설정이 없습니다.");
+      return [];
     }
 
     // 먼저 데이터베이스 속성을 확인
-    const database = await notion.databases.retrieve({
-      database_id: DATABASE_ID,
-    });
-    const properties = database.properties;
+    await getDatabaseProperties();
 
-    // 사용 가능한 속성 이름 찾기
-    const publishedProperty =
-      properties.Published || properties.Status || properties.Name;
-    const sortProperty = publishedProperty
-      ? Object.keys(properties).find(
-          (key) =>
-            properties[key].type === "created_time" ||
-            properties[key].type === "last_edited_time" ||
-            properties[key].type === "date"
-        ) || "created_time"
-      : "created_time";
-
-    const response = await notion.databases.query({
-      database_id: DATABASE_ID,
-      // Published 속성이 있으면 필터 적용, 없으면 모든 포스트 가져오기
-      ...(publishedProperty && publishedProperty.type === "checkbox"
-        ? {
-            filter: {
-              property: "Published",
-              checkbox: {
-                equals: true,
-              },
-            },
-          }
-        : {}),
-      sorts: [
-        {
-          property: sortProperty,
-          direction: "descending",
+    // Notion API를 사용하여 데이터베이스에서 페이지 가져오기
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
+          "Content-Type": "application/json",
+          "Notion-Version": "2022-06-28",
         },
-      ],
-    });
+        body: JSON.stringify({}),
+      }
+    );
 
-    const posts = await Promise.all(
-      response.results.map(async (page: any) => {
-        const blogPost = transformNotionPageToBlogPost(page);
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Notion API error:", response.status, errorData);
+      throw new Error(`Notion API error: ${response.status} - ${errorData}`);
+    }
 
-        // 페이지 내용 가져오기
-        const blocks = await notion.blocks.children.list({
-          block_id: page.id,
-        });
-
-        blogPost.content = await convertNotionBlocksToMarkdown(blocks.results);
-
-        // 읽기 시간 계산 (대략 200단어/분)
-        const wordCount = blogPost.content.split(/\s+/).length;
-        blogPost.readingTime = Math.ceil(wordCount / 200);
-
-        return blogPost;
-      })
+    const data = await response.json();
+    const posts = data.results.map((page: any) =>
+      transformNotionPageToBlogPost(page)
     );
 
     return posts;
   } catch (error) {
-    console.error("Error fetching posts from Notion:", error);
-    console.log("더미 데이터를 사용합니다.");
-    return createDummyPosts();
+    console.error("Error fetching posts:", error);
+    return [];
   }
 }
 
 // 특정 포스트 가져오기
-export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+export async function getPostBySlug(
+  id: string
+): Promise<ExtendedRecordMap | null> {
+  const recordMap = await notionClient.getPage(id);
+  return recordMap;
+}
+// Notion 페이지의 RecordMap 가져오기
+export async function getNotionPageRecordMap(
+  pageId: string
+): Promise<ExtendedRecordMap | null> {
   try {
-    // Notion API 키나 데이터베이스 ID가 없으면 더미 데이터에서 찾기
-    if (!process.env.NOTION_API_KEY || !DATABASE_ID) {
-      const dummyPosts = createDummyPosts();
-      return dummyPosts.find((post) => post.slug === slug) || null;
-    }
-
-    const response = await notion.databases.query({
-      database_id: DATABASE_ID,
-      filter: {
-        property: "Slug",
-        rich_text: {
-          equals: slug,
-        },
-      },
-    });
-
-    if (response.results.length === 0) {
+    if (!process.env.NOTION_TOKEN) {
       return null;
     }
 
-    const page = response.results[0];
-    const blogPost = transformNotionPageToBlogPost(page);
-
-    // 페이지 내용 가져오기
-    const blocks = await notion.blocks.children.list({
-      block_id: page.id,
-    });
-
-    blogPost.content = await convertNotionBlocksToMarkdown(blocks.results);
-
-    // 읽기 시간 계산
-    const wordCount = blogPost.content.split(/\s+/).length;
-    blogPost.readingTime = Math.ceil(wordCount / 200);
-
-    return blogPost;
+    const recordMap = await notionClient.getPage(pageId);
+    return recordMap;
   } catch (error) {
-    console.error("Error fetching post by slug:", error);
-    // 에러 발생 시 더미 데이터에서 찾기
-    const dummyPosts = createDummyPosts();
-    return dummyPosts.find((post) => post.slug === slug) || null;
+    console.error("Error fetching Notion page record map:", error);
+    return null;
+  }
+}
+
+// 특정 포스트와 RecordMap 가져오기
+export async function getPostWithRecordMap(slug: string): Promise<{
+  post: BlogPost | null;
+  recordMap: ExtendedRecordMap | null;
+}> {
+  try {
+    if (!process.env.NOTION_TOKEN || !NOTION_DATABASE_ID) {
+      return { post: null, recordMap: null };
+    }
+
+    // 먼저 포스트 정보 가져오기
+    const post = await getPostBySlug(slug);
+
+    if (!post) {
+      return { post: null, recordMap: null };
+    }
+
+    // 포스트의 실제 Notion 페이지 ID를 사용하여 RecordMap 가져오기
+    const recordMap = await getNotionPageRecordMap(slug);
+
+    return { recordMap, post: null };
+  } catch (error) {
+    console.error("Error fetching post with record map:", error);
+    return { post: null, recordMap: null };
   }
 }
 
@@ -358,61 +215,51 @@ export async function getPostsByCategory(
   category: string
 ): Promise<BlogPost[]> {
   try {
-    // Notion API 키나 데이터베이스 ID가 없으면 더미 데이터에서 필터링
-    if (!process.env.NOTION_API_KEY || !DATABASE_ID) {
-      const dummyPosts = createDummyPosts();
-      return dummyPosts.filter((post) => post.category === category);
+    if (!process.env.NOTION_TOKEN || !NOTION_DATABASE_ID) {
+      return [];
     }
 
-    const response = await notion.databases.query({
-      database_id: DATABASE_ID,
-      filter: {
-        and: [
-          {
-            property: "Published",
-            checkbox: {
-              equals: true,
-            },
-          },
-          {
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
+          "Content-Type": "application/json",
+          "Notion-Version": "2022-06-28",
+        },
+        body: JSON.stringify({
+          filter: {
             property: "Category",
             select: {
               equals: category,
             },
           },
-        ],
-      },
-      sorts: [
-        {
-          property: "Published",
-          direction: "descending",
-        },
-      ],
-    });
+          sorts: [
+            {
+              property: "Created",
+              direction: "descending",
+            },
+          ],
+        }),
+      }
+    );
 
-    const posts = await Promise.all(
-      response.results.map(async (page: any) => {
-        const blogPost = transformNotionPageToBlogPost(page);
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Notion API error:", response.status, errorData);
+      throw new Error(`Notion API error: ${response.status} - ${errorData}`);
+    }
 
-        const blocks = await notion.blocks.children.list({
-          block_id: page.id,
-        });
-
-        blogPost.content = await convertNotionBlocksToMarkdown(blocks.results);
-
-        const wordCount = blogPost.content.split(/\s+/).length;
-        blogPost.readingTime = Math.ceil(wordCount / 200);
-
-        return blogPost;
-      })
+    const data = await response.json();
+    const posts = data.results.map((page: any) =>
+      transformNotionPageToBlogPost(page)
     );
 
     return posts;
   } catch (error) {
     console.error("Error fetching posts by category:", error);
-    // 에러 발생 시 더미 데이터에서 필터링
-    const dummyPosts = createDummyPosts();
-    return dummyPosts.filter((post) => post.category === category);
+    return [];
   }
 }
 
@@ -465,15 +312,58 @@ export async function getAllTags(): Promise<BlogTag[]> {
 // 검색 기능
 export async function searchPosts(query: string): Promise<BlogPost[]> {
   try {
-    const posts = await getAllPosts();
+    if (!process.env.NOTION_TOKEN || !NOTION_DATABASE_ID) {
+      return [];
+    }
 
-    return posts.filter(
-      (post) =>
-        post.title.toLowerCase().includes(query.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(query.toLowerCase()) ||
-        post.content.toLowerCase().includes(query.toLowerCase()) ||
-        post.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()))
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
+          "Content-Type": "application/json",
+          "Notion-Version": "2022-06-28",
+        },
+        body: JSON.stringify({
+          filter: {
+            or: [
+              {
+                property: "Title",
+                title: {
+                  contains: query,
+                },
+              },
+              {
+                property: "Excerpt",
+                rich_text: {
+                  contains: query,
+                },
+              },
+            ],
+          },
+          sorts: [
+            {
+              property: "Created",
+              direction: "descending",
+            },
+          ],
+        }),
+      }
     );
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Notion API error:", response.status, errorData);
+      throw new Error(`Notion API error: ${response.status} - ${errorData}`);
+    }
+
+    const data = await response.json();
+    const posts = data.results.map((page: any) =>
+      transformNotionPageToBlogPost(page)
+    );
+
+    return posts;
   } catch (error) {
     console.error("Error searching posts:", error);
     return [];
