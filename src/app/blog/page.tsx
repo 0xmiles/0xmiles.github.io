@@ -1,73 +1,108 @@
-import { Metadata } from 'next';
-import { getAllPosts } from '@/lib/notion';
-import { BlogList } from '@/components/blog/BlogList';
-import { Button } from '@/components/ui/Button';
-import { Filter, Grid, List } from 'lucide-react';
+import { Metadata } from 'next'
+import { getBlogPosts, getAllTags } from '@/lib/notion'
+import { BlogCard } from '@/components/blog/BlogCard'
+import { SearchBar } from '@/components/blog/SearchBar'
+import { TagFilter } from '@/components/blog/TagFilter'
 
 export const metadata: Metadata = {
   title: '블로그',
-  description: '개발자 kyoongdev의 모든 블로그 포스트를 확인해보세요.',
-};
+  description: 'KyoongDev의 모든 블로그 포스트를 확인해보세요.',
+}
 
-export default async function BlogPage() {
-  const posts = await getAllPosts();
-  const featuredPost = posts.length > 0 ? posts[0] : undefined;
+interface BlogPageProps {
+  searchParams: {
+    search?: string
+    tag?: string
+  }
+}
+
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const [posts, tags] = await Promise.all([
+    getBlogPosts(),
+    getAllTags()
+  ])
+
+  let filteredPosts = posts
+
+  // 검색 필터링
+  if (searchParams.search) {
+    const searchQuery = searchParams.search.toLowerCase()
+    filteredPosts = posts.filter(post => 
+      post.title.toLowerCase().includes(searchQuery) ||
+      post.description?.toLowerCase().includes(searchQuery) ||
+      post.tags.some(tag => tag.toLowerCase().includes(searchQuery))
+    )
+  }
+
+  // 태그 필터링
+  if (searchParams.tag) {
+    filteredPosts = filteredPosts.filter(post => 
+      post.tags.includes(searchParams.tag!)
+    )
+  }
 
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 헤더 */}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             블로그
           </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            개발과 관련된 다양한 주제의 포스트들을 확인해보세요.
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            개발과 기술에 대한 이야기를 공유합니다
           </p>
         </div>
 
-        {/* 검색 및 필터 */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="w-full sm:w-96">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="포스트 검색..."
-                  className="w-full pl-10 pr-4 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-                />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                필터
-              </Button>
-              <div className="flex border rounded-md">
-                <Button variant="ghost" size="sm" className="rounded-r-none">
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" className="rounded-l-none">
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
+        {/* Search and Filter */}
+        <div className="mb-8 space-y-4">
+          <SearchBar />
+          <TagFilter tags={tags} selectedTag={searchParams.tag} />
         </div>
 
-        {/* 포스트 목록 */}
-        <BlogList 
-          posts={posts} 
-          featuredPost={featuredPost}
-          showFeatured={true}
-        />
+        {/* Results Info */}
+        {searchParams.search && (
+          <div className="mb-6">
+            <p className="text-gray-600 dark:text-gray-400">
+              "{searchParams.search}"에 대한 검색 결과: {filteredPosts.length}개
+            </p>
+          </div>
+        )}
+
+        {searchParams.tag && (
+          <div className="mb-6">
+            <p className="text-gray-600 dark:text-gray-400">
+              "{searchParams.tag}" 태그의 포스트: {filteredPosts.length}개
+            </p>
+          </div>
+        )}
+
+        {/* Blog Posts */}
+        {filteredPosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPosts.map((post) => (
+              <BlogCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-gray-400 dark:text-gray-500 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              {searchParams.search || searchParams.tag ? '검색 결과가 없습니다' : '아직 포스트가 없습니다'}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              {searchParams.search || searchParams.tag 
+                ? '다른 검색어나 태그를 시도해보세요.' 
+                : '곧 흥미로운 내용으로 찾아뵙겠습니다.'
+              }
+            </p>
+          </div>
+        )}
       </div>
     </div>
-  );
+  )
 }

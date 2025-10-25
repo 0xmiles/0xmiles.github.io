@@ -1,74 +1,75 @@
 "use client";
 
-import React from "react";
-import { NotionRenderer } from "react-notion-x";
 import { ExtendedRecordMap } from "notion-types";
-import dynamic from "next/dynamic";
+import { useEffect } from "react";
+import { NotionRenderer as NotionRendererComponent } from "react-notion-x";
 
-// core styles shared by all of react-notion-x (required)
+// Import the CSS for react-notion-x
 import "react-notion-x/src/styles.css";
-
-// used for code syntax highlighting (optional)
-import "prismjs/themes/prism-tomorrow.css";
-
-// used for rendering equations (optional)
-import "katex/dist/katex.min.css";
-
-// 동적 컴포넌트 로딩
+import "./notion.css";
+import dynamic from "next/dynamic";
 const Code = dynamic(() =>
   import("react-notion-x/build/third-party/code").then((m) => m.Code)
 );
-const Collection = dynamic(() =>
-  import("react-notion-x/build/third-party/collection").then(
-    (m) => m.Collection
-  )
-);
-const Equation = dynamic(() =>
-  import("react-notion-x/build/third-party/equation").then((m) => m.Equation)
-);
-const Pdf = dynamic(
-  () => import("react-notion-x/build/third-party/pdf").then((m) => m.Pdf),
-  {
-    ssr: false,
-  }
-);
-const Modal = dynamic(
-  () => import("react-notion-x/build/third-party/modal").then((m) => m.Modal),
-  {
-    ssr: false,
-  }
-);
-
 interface NotionRendererProps {
   recordMap: ExtendedRecordMap;
-  className?: string;
 }
 
-export const NotionRendererComponent: React.FC<NotionRendererProps> = ({
-  recordMap,
-  className = "",
-}) => {
+export const NotionRenderer = ({ recordMap }: NotionRendererProps) => {
+  useEffect(() => {
+    // Load Prism.js for code highlighting
+    const loadPrism = async () => {
+      if (typeof window !== "undefined") {
+        try {
+          const Prism = (await import("prismjs")).default;
+
+          // Load common languages using dynamic imports
+          const languages = [
+            "prismjs/components/prism-javascript",
+            "prismjs/components/prism-typescript",
+            "prismjs/components/prism-python",
+            "prismjs/components/prism-java",
+            "prismjs/components/prism-css",
+            "prismjs/components/prism-json",
+            "prismjs/components/prism-bash",
+            "prismjs/components/prism-sql",
+          ];
+
+          for (const lang of languages) {
+            try {
+              await import(lang);
+            } catch (e) {
+              // Language not found, continue
+            }
+          }
+
+          // Highlight all code blocks
+          Prism.highlightAll();
+        } catch (error) {
+          console.warn("Failed to load Prism.js:", error);
+        }
+      }
+    };
+
+    loadPrism();
+  }, []);
+
   return (
-    <div className={`notion-container ${className}`}>
-      <NotionRenderer
-        recordMap={recordMap}
-        fullPage={false}
-        darkMode={false}
-        previewImages={true}
-        showCollectionViewDropdown={false}
-        showTableOfContents={true}
-        minTableOfContentsItems={3}
-        defaultPageIcon="📄"
-        defaultPageCover=""
-        defaultPageCoverPosition={0.5}
-        components={{
-          Code,
-          Collection,
-          Equation,
-          Modal,
-          Pdf,
-        }}
-      />
-    </div>
+    <NotionRendererComponent
+      recordMap={recordMap}
+      fullPage={false}
+      darkMode={true}
+      previewImages={true}
+      showCollectionViewDropdown={false}
+      showTableOfContents={true}
+      minTableOfContentsItems={3}
+      defaultPageIcon="📄"
+      defaultPageCover=""
+      defaultPageCoverPosition={0.5}
+      className="notion-post"
+      components={{
+        Code,
+      }}
+    />
   );
 };

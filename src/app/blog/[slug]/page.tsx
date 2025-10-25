@@ -1,13 +1,10 @@
-import { Button } from "@/components/ui/Button";
-import { NotionRendererComponent } from "@/components/blog/NotionRenderer";
-import { getAllPosts, getPostBySlug, getPostWithRecordMap } from "@/lib/notion";
-import { formatDate } from "@/lib/utils";
-import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-
+import { getBlogPost, getBlogPosts } from "@/lib/notion";
+import { NotionRenderer } from "@/components/blog/NotionRenderer";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 import Link from "next/link";
-import { ExtendedRecordMap } from "notion-types";
 
 interface BlogPostPageProps {
   params: {
@@ -16,7 +13,7 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts();
+  const posts = await getBlogPosts();
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -24,128 +21,121 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: BlogPostPageProps): Promise<ExtendedRecordMap | null> {
-  const recordMap = await getPostBySlug(params.slug);
+}: BlogPostPageProps): Promise<Metadata> {
+  const post = await getBlogPost(params.slug);
 
-  if (!recordMap) {
-    return null;
+  if (!post) {
+    return {
+      title: "포스트를 찾을 수 없습니다",
+    };
   }
 
-  return recordMap;
+  return {
+    title: post.title,
+    description: post.description,
+    keywords: post.tags,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: [post.author],
+      tags: post.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { post, recordMap } = await getPostWithRecordMap(params.slug);
+  const post = await getBlogPost(params.slug);
 
   if (!post) {
     notFound();
   }
 
   return (
-    <article className="min-h-screen py-8">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        {/* 뒤로가기 버튼 */}
-        <div className="mb-8">
-          <Link href="/blog">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              블로그로 돌아가기
-            </Button>
-          </Link>
-        </div>
-
-        {/* 포스트 헤더 */}
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
         <header className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-            <span className="inline-flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
-              {formatDate(post.publishedAt)}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {post.readingTime}분 읽기
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <Tag className="h-3 w-3" />
-              {post.category}
-            </span>
+          <div className="mb-4">
+            <Link
+              href="/blog"
+              className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              블로그로 돌아가기
+            </Link>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 leading-tight">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
             {post.title}
           </h1>
 
-          {post.excerpt && (
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              {post.excerpt}
+          {post.description && (
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">
+              {post.description}
             </p>
           )}
+
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <span>{post.author}</span>
+            <span>•</span>
+            <time dateTime={post.publishedAt}>
+              {format(new Date(post.publishedAt), "yyyy년 M월 d일", {
+                locale: ko,
+              })}
+            </time>
+            {post.tags.length > 0 && (
+              <>
+                <span>•</span>
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-xs"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </header>
 
-        {/* 커버 이미지 */}
-        {post.coverImage && (
+        {/* Cover Image */}
+        {post.cover && (
           <div className="mb-8">
             <img
-              src={post.coverImage}
+              src={post.cover}
               alt={post.title}
               className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
             />
           </div>
         )}
 
-        {/* 태그 */}
-        {post.tags.length > 0 && (
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-block px-3 py-1 text-sm bg-secondary text-secondary-foreground rounded-full"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 포스트 내용 */}
-        {recordMap ? (
-          <NotionRendererComponent recordMap={recordMap} />
-        ) : (
-          <div className="prose prose-lg max-w-none">
-            <div
-              className="notion-content"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-          </div>
-        )}
-
-        {/* 포스트 푸터 */}
-        <footer className="mt-12 pt-8 border-t">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-bold">
-                  {post.author.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div>
-                <div className="font-semibold text-foreground">
-                  {post.author.name}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {post.author.email}
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-muted-foreground">
-              마지막 수정: {formatDate(post.updatedAt)}
-            </div>
-          </div>
-        </footer>
-      </div>
-    </article>
+        {/* Content */}
+        <div className="prose prose-lg max-w-none dark:prose-invert">
+          {<NotionRenderer recordMap={post.content!} />}
+        </div>
+      </article>
+    </div>
   );
 }

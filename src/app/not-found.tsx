@@ -1,55 +1,41 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
-import { Home, ArrowLeft, Search } from 'lucide-react';
+import Link from 'next/link'
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: '페이지를 찾을 수 없습니다',
   description: '요청하신 페이지를 찾을 수 없습니다.',
-};
+}
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center max-w-md mx-auto px-4">
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="text-center">
         <div className="mb-8">
-          <h1 className="text-9xl font-bold text-primary/20 mb-4">404</h1>
-          <h2 className="text-3xl font-bold text-foreground mb-4">
+          <h1 className="text-9xl font-bold text-primary-600 dark:text-primary-400">404</h1>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mt-4">
             페이지를 찾을 수 없습니다
           </h2>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.
           </p>
         </div>
-
+        
         <div className="space-y-4">
-          <Link href="/">
-            <Button size="lg" className="w-full">
-              <Home className="h-4 w-4 mr-2" />
-              홈으로 돌아가기
-            </Button>
+          <Link
+            href="/"
+            className="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            홈으로 돌아가기
           </Link>
-          
-          <Link href="/blog">
-            <Button variant="outline" size="lg" className="w-full">
-              <Search className="h-4 w-4 mr-2" />
-              블로그 보기
-            </Button>
-          </Link>
-        </div>
-
-        <div className="mt-8 text-sm text-muted-foreground">
-          <p>
-            문제가 지속되면{' '}
-            <a
-              href={`mailto:${process.env.NEXT_PUBLIC_AUTHOR_EMAIL || 'kyoongdev@example.com'}`}
-              className="text-primary hover:underline"
-            >
-              연락해주세요
-            </a>
-          </p>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            또는{' '}
+            <Link href="/blog" className="text-primary-600 dark:text-primary-400 hover:underline">
+              블로그
+            </Link>
+            {' '}를 확인해보세요
+          </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
