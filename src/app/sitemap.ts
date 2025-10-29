@@ -4,7 +4,7 @@ import { getBlogPosts } from "@/lib/notion";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getBlogPosts();
   const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "https://kyoongdev.github.io";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://0xmiles.github.io";
 
   const staticPages = [
     {

@@ -59,7 +59,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         publishedAt:
           properties["Created Time"]?.date?.start || page.created_time,
         tags: properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
-        author: properties.Author?.rich_text?.[0]?.plain_text || "KyoongDev",
+        author: properties.Author?.rich_text?.[0]?.plain_text || "Miles",
       };
     });
   } catch (error) {
@@ -167,7 +167,7 @@ export async function getBlogPostsByTag(tag: string): Promise<BlogPost[]> {
         publishedAt:
           properties["Created Time"]?.date?.start || page.created_time,
         tags: properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
-        author: properties.Author?.rich_text?.[0]?.plain_text || "KyoongDev",
+        author: properties.Author?.rich_text?.[0]?.plain_text || "Miles",
       };
     });
   } catch (error) {

@@ -9,20 +9,20 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "KyoongDev Blog",
-    template: "%s | KyoongDev Blog",
+    default: "Miles Blog",
+    template: "%s | Miles Blog",
   },
   description: "A blog powered by Notion and Next.js",
   keywords: ["blog", "notion", "spring boot", "react", "typescript"],
-  authors: [{ name: "KyoongDev" }],
-  creator: "KyoongDev",
+  authors: [{ name: "Miles" }],
+  creator: "Miles",
   openGraph: {
     type: "website",
     locale: "ko_KR",
     url: process.env.NEXT_PUBLIC_SITE_URL,
-    title: "KyoongDev Blog",
+    title: "Miles Blog",
     description: "A blog powered by Notion and Next.js",
-    siteName: "KyoongDev Blog",
+    siteName: "Miles Blog",
   },
 
   robots: {

@@ -60,7 +60,7 @@ export const Footer = () => {
             </h3>
             <div className="flex space-x-4">
               <a
-                href="https://github.com/kyoongdev"
+                href="https://github.com/0xmiles"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
@@ -81,7 +81,7 @@ export const Footer = () => {
         <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              © 2024 KyoongDev. All rights reserved.
+              © 2024 Miles. All rights reserved.
             </p>
             <p className="text-gray-600 dark:text-gray-400 text-sm mt-2 md:mt-0">
               Powered by{" "}

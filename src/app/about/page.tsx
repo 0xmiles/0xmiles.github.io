@@ -3,7 +3,7 @@ import { ProjectCard } from "@/components/about/ProjectCard";
 
 export const metadata: Metadata = {
   title: "소개",
-  description: "KyoongDev에 대해 알아보세요.",
+  description: "Miles에 대해 알아보세요.",
 };
 
 export default function AboutPage() {

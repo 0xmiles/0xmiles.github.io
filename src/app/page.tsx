@@ -5,7 +5,7 @@ import { Hero } from "@/components/blog/Hero";
 
 export const metadata: Metadata = {
   title: "홈",
-  description: "KyoongDev의 개인 블로그입니다. 개발 관련 글들을 공유합니다.",
+  description: "Miles의 개인 블로그입니다. 개발 관련 글들을 공유합니다.",
 };
 
 export default async function HomePage() {
