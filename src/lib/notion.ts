@@ -8,11 +8,12 @@ const notion = new Client({
 });
 
 // Notion Client API (for page content)
-const notionClient = new NotionAPI({
-  authToken: process.env.NOTION_AUTH_TOKEN,
-  // 추가 옵션들
-  activeUser: process.env.NOTION_USER,
-});
+const notionClient = process.env.NOTION_AUTH_TOKEN
+  ? new NotionAPI({
+      authToken: process.env.NOTION_AUTH_TOKEN,
+      activeUser: process.env.NOTION_USER,
+    })
+  : null;
 // 블로그 포스트 타입 정의
 export interface BlogPost {
   id: string;
@@ -78,46 +79,66 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
       return null;
     }
 
-    try {
-      const recordMap = await notionClient.getPage(post.id, {});
-      return {
-        ...post,
-        content: recordMap,
-      };
-    } catch (pageError) {
-      console.error("Error fetching page content:", pageError);
-
-      // 대안: @notionhq/client를 사용하여 페이지 내용 가져오기
+    // notion-client를 사용하여 페이지 콘텐츠 가져오기 (가능한 경우)
+    if (notionClient) {
       try {
-        const response = await notion.blocks.children.list({
-          block_id: post.id,
-        });
-
-        // ExtendedRecordMap 형태로 변환
-        const recordMap: any = {
-          block: {},
-          blockIds: [],
-          collection: {},
-          collectionView: {},
-          notion_user: {},
-          signed_urls: {},
-          preview_images: {},
-        };
-
-        // 블록 데이터 변환
-        response.results.forEach((block: any) => {
-          recordMap.block[block.id] = block;
-          recordMap.blockIds.push(block.id);
-        });
-
+        const recordMap = await notionClient.getPage(post.id, {});
         return {
           ...post,
           content: recordMap,
         };
-      } catch (fallbackError) {
-        console.error("Fallback method also failed:", fallbackError);
-        throw pageError; // 원래 에러를 다시 던짐
+      } catch (pageError: any) {
+        console.error(
+          "Error fetching page content with notion-client:",
+          pageError.message
+        );
+        // fallback으로 계속 진행
       }
+    }
+
+    // 대안: @notionhq/client를 사용하여 페이지 내용 가져오기
+    try {
+      const response = await notion.blocks.children.list({
+        block_id: post.id,
+      });
+
+      // ExtendedRecordMap 형태로 변환
+      const recordMap = {
+        block: {},
+        collection: {},
+        collectionView: {},
+        collection_view: {},
+        collection_query: {},
+        notion_user: {},
+        signed_urls: {},
+        preview_images: {},
+      } as unknown as ExtendedRecordMap;
+
+      // 블록 데이터 변환
+      response.results.forEach((block: any) => {
+        recordMap.block[block.id] = block;
+      });
+
+      return {
+        ...post,
+        content: recordMap,
+      };
+    } catch (fallbackError) {
+      console.error("Fallback method also failed:", fallbackError);
+      // 에러가 발생해도 빌드를 계속 진행할 수 있도록 기본 구조 반환
+      return {
+        ...post,
+        content: {
+          block: {},
+          collection: {},
+          collectionView: {},
+          collection_view: {},
+          collection_query: {},
+          notion_user: {},
+          signed_urls: {},
+          preview_images: {},
+        } as unknown as ExtendedRecordMap,
+      };
     }
   } catch (error) {
     console.error("Error fetching blog post:", error);

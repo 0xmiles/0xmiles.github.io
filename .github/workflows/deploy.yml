@@ -28,9 +28,11 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-          NEXT_PUBLIC_SITE_NAME: ${{ secrets.NEXT_PUBLIC_SITE_NAME }}
-          NEXT_PUBLIC_SITE_DESCRIPTION: ${{ secrets.NEXT_PUBLIC_SITE_DESCRIPTION }}
+          NOTION_AUTH_TOKEN: ${{ secrets.NOTION_AUTH_TOKEN }}
+          NOTION_USER: ${{ secrets.NOTION_USER }}
+          NEXT_PUBLIC_SITE_URL: "https://0xmiles.github.io"
+          NEXT_PUBLIC_SITE_NAME: "Miles Blog"
+          NEXT_PUBLIC_SITE_DESCRIPTION: "Miles's blog"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
