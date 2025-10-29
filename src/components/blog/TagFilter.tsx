@@ -5,11 +5,11 @@ import { useSearchParams } from 'next/navigation'
 
 interface TagFilterProps {
   tags: string[]
-  selectedTag?: string
 }
 
-export const TagFilter = ({ tags, selectedTag }: TagFilterProps) => {
+export const TagFilter = ({ tags }: TagFilterProps) => {
   const searchParams = useSearchParams()
+  const selectedTag = searchParams.get('tag')
 
   if (tags.length === 0) return null
 
