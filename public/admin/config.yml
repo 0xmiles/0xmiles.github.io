@@ -1,0 +1,39 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Uncomment when testing locally
+# local_backend: true
+
+media_folder: "public/images/posts"
+public_folder: "/images/posts"
+
+collections:
+  - name: "posts"
+    label: "Blog Posts"
+    folder: "src/content/posts"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    fields:
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "Description", name: "description", widget: "text", required: true }
+      - { label: "Publish Date", name: "date", widget: "datetime", required: true }
+      - { label: "Updated Date", name: "updated", widget: "datetime", required: false }
+      - { 
+          label: "Category", 
+          name: "category", 
+          widget: "select", 
+          options: ["web", "backend", "devops", "database", "algorithms", "architecture"],
+          required: true
+        }
+      - { label: "Tags", name: "tags", widget: "list", required: true, min: 1 }
+      - { label: "Draft", name: "draft", widget: "boolean", default: false, required: true }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false, required: true }
+      - { label: "Cover Image", name: "image", widget: "image", required: false }
+      - { label: "Image Alt Text", name: "imageAlt", widget: "string", required: false }
+      - { label: "Author", name: "author", widget: "string", default: "0xmiles", required: true }
+      - { label: "Canonical URL", name: "canonicalUrl", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown", required: true }
+

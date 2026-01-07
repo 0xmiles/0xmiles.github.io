@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCategoryLabel } from '../../utils/seo';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+  const categories = [...new Set(allPosts.map(post => post.data.category))];
+
+  return categories.map((category) => {
+    const categoryPosts = allPosts.filter(post => post.data.category === category);
+    return {
+      params: { category },
+      props: { 
+        posts: categoryPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf()),
+        category
+      },
+    };
+  });
+}
+
+const { posts, category } = Astro.props;
+const categoryLabel = getCategoryLabel(category);
+---
+
+<BaseLayout 
+  title={`${categoryLabel} | 0xmiles`}
+  description={`Browse all posts about ${categoryLabel.toLowerCase()} on 0xmiles technical blog.`}
+>
+  <div class="container-custom py-12">
+    <!-- Header -->
+    <header class="mb-12">
+      <div class="mb-4">
+        <a 
+          href="/posts"
+          class="inline-flex items-center text-green-500 dark:text-green-300 hover:text-green-700 dark:hover:text-green-200 font-medium"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to all posts
+        </a>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+        {categoryLabel}
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400">
+        {posts.length} {posts.length === 1 ? 'post' : 'posts'} in this category
+      </p>
+    </header>
+
+    <!-- Posts Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {posts.map(post => (
+        <PostCard post={post} />
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    {posts.length === 0 && (
+      <div class="text-center py-16">
+        <p class="text-xl text-gray-600 dark:text-gray-400">
+          No posts found in this category yet.
+        </p>
+        <a 
+          href="/posts"
+          class="inline-block mt-4 text-green-500 dark:text-green-300 hover:text-green-700 dark:hover:text-green-200 font-medium"
+        >
+          View all posts
+        </a>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+

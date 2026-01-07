@@ -1,0 +1,114 @@
+---
+import { SEO } from 'astro-seo';
+import type { SEOProps } from '../utils/seo';
+
+interface Props extends SEOProps {}
+
+const { 
+  title, 
+  description, 
+  image = '/images/og-default.jpg',
+  canonical,
+  type = 'website',
+  publishedTime,
+  tags = []
+} = Astro.props;
+
+const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(image, Astro.site);
+const siteName = '0xmiles Tech Blog';
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+
+<SEO
+  title={title}
+  description={description}
+  canonical={canonicalURL.toString()}
+  openGraph={{
+    basic: {
+      title: title,
+      type: type,
+      image: imageURL.toString(),
+      url: canonicalURL.toString(),
+    },
+    optional: {
+      description: description,
+      siteName: siteName,
+    },
+    article: publishedTime ? {
+      publishedTime: publishedTime.toISOString(),
+      authors: ['0xmiles'],
+      tags: tags,
+    } : undefined,
+  }}
+  twitter={{
+    card: 'summary_large_image',
+    site: '@0xmiles',
+    creator: '@0xmiles',
+    title: title,
+    description: description,
+    image: imageURL.toString(),
+  }}
+  extend={{
+    meta: [
+      { name: 'keywords', content: tags.join(', ') },
+      { name: 'author', content: '0xmiles' },
+    ],
+    link: [
+      { rel: 'alternate', type: 'application/rss+xml', title: 'RSS Feed', href: '/rss.xml' },
+      { rel: 'sitemap', href: '/sitemap-index.xml' },
+    ],
+  }}
+/>
+
+{type === 'article' && publishedTime && (
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description: description,
+    image: imageURL.toString(),
+    datePublished: publishedTime.toISOString(),
+    author: {
+      '@type': 'Person',
+      name: '0xmiles',
+      url: Astro.site?.toString(),
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: '0xmiles',
+      logo: {
+        '@type': 'ImageObject',
+        url: new URL('/images/logo.png', Astro.site).toString(),
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalURL.toString(),
+    },
+  })} />
+)}
+
+<script is:inline>
+  // Dark mode initialization
+  const theme = (() => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      return localStorage.getItem('theme');
+    }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  })();
+
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+</script>
+

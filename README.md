@@ -1,208 +1,330 @@
-# Miles Blog
+# 0xmiles Technical Blog
 
-Notion과 Next.js로 구축된 개인 블로그입니다.
+A modern, SEO-optimized technical blog built with Astro and hosted on GitHub Pages. Features a headless CMS for easy content management without manual git operations.
 
-## 🚀 기능
+## 🚀 Features
 
-- **Notion 연동**: Notion 데이터베이스를 CMS로 사용
-- **정적 사이트 생성**: Next.js의 정적 사이트 생성 기능 활용
-- **SEO 최적화**: 메타데이터, 사이트맵, robots.txt 자동 생성
-- **다크모드**: 사용자 선호도에 따른 테마 전환
-- **반응형 디자인**: 모바일부터 데스크톱까지 완벽한 반응형
-- **코드 하이라이팅**: Prism.js를 활용한 아름다운 코드 블록
-- **검색 기능**: 제목, 설명, 태그 기반 포스트 검색
-- **태그 필터링**: 카테고리별 포스트 필터링
+- ✅ **SEO-Optimized**: Meta tags, Open Graph, Twitter Cards, structured data, sitemap, RSS feed
+- ✅ **Markdown-First**: Write posts in Markdown with frontmatter validation
+- ✅ **Headless CMS**: Edit posts via web UI at `/admin` (Decap CMS)
+- ✅ **Zero JavaScript**: Static HTML for optimal performance
+- ✅ **Dark Mode**: Automatic dark mode support
+- ✅ **Responsive Design**: Mobile-first, accessible design
+- ✅ **Type-Safe**: TypeScript with Zod schema validation
+- ✅ **Auto-Deploy**: GitHub Actions deployment on push
 
-## 🛠 기술 스택
+## 📁 Project Structure
 
-- **Frontend**: Next.js 14.0.4, React 18, TypeScript 5
-- **Styling**: Tailwind CSS 3.3, @tailwindcss/typography
-- **CMS**: Notion API (@notionhq/client, notion-client)
-- **Rendering**: react-notion-x 7.7.1
-- **Code Highlighting**: Prism.js 1.29
-- **Utilities**: date-fns, react-use
-- **Package Manager**: Yarn
-- **Deployment**: GitHub Pages
-
-## 📦 설치 및 실행
-
-### 1. 저장소 클론
-
-```bash
-git clone https://github.com/0xmiles/0xmiles.github.io.git
-cd 0xmiles.github.io
+```
+0xmiles.github.io/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml              # GitHub Actions deployment
+├── public/
+│   ├── admin/
+│   │   ├── config.yml             # Decap CMS configuration
+│   │   └── index.html             # CMS entry point
+│   ├── images/                    # Static images
+│   ├── robots.txt
+│   └── favicon.svg
+├── src/
+│   ├── components/
+│   │   ├── BaseHead.astro         # SEO meta tags
+│   │   ├── Header.astro           # Site header with navigation
+│   │   ├── Footer.astro           # Site footer
+│   │   ├── PostCard.astro         # Post preview card
+│   │   └── CategoryList.astro     # Category display
+│   ├── content/
+│   │   ├── config.ts              # Content collections schema
+│   │   └── posts/                 # Blog posts (Markdown)
+│   ├── layouts/
+│   │   ├── BaseLayout.astro       # Base page layout
+│   │   └── PostLayout.astro       # Blog post layout
+│   ├── pages/
+│   │   ├── index.astro            # Home page
+│   │   ├── posts/
+│   │   │   ├── index.astro        # All posts page
+│   │   │   └── [slug].astro       # Individual post page
+│   │   ├── category/
+│   │   │   └── [category].astro   # Category pages
+│   │   └── rss.xml.ts             # RSS feed generator
+│   ├── styles/
+│   │   └── global.css             # Global styles
+│   └── utils/
+│       └── seo.ts                 # SEO helper functions
+├── astro.config.mjs
+├── tailwind.config.mjs
+├── tsconfig.json
+└── package.json
 ```
 
-### 2. 의존성 설치
+## 🛠️ Setup Instructions
+
+### 1. Install Dependencies
 
 ```bash
-yarn install
-# 또는
 npm install
 ```
 
-### 3. 환경 변수 설정
-
-`.env.local` 파일을 생성하고 다음 변수들을 설정하세요:
-
-```env
-# Notion Integration (필수)
-NOTION_TOKEN=your_notion_integration_token
-NOTION_DATABASE_ID=your_notion_database_id
-
-# Notion Client API (선택적, 페이지 콘텐츠 렌더링용)
-NOTION_AUTH_TOKEN=your_notion_auth_token
-NOTION_USER=your_notion_user_id
-
-# Site Configuration (필수)
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
-NEXT_PUBLIC_SITE_NAME=Miles Blog
-NEXT_PUBLIC_SITE_DESCRIPTION=A blog powered by Notion
-```
-
-**Notion 설정 방법:**
-
-1. [Notion Integrations](https://www.notion.so/my-integrations)에서 새 Integration 생성
-2. `NOTION_TOKEN`에 Integration Token 복사
-3. Notion 데이터베이스에서 해당 Integration을 "연결"로 설정
-4. 데이터베이스 URL에서 `NOTION_DATABASE_ID` 추출 (32자리 UUID)
-
-### 4. 개발 서버 실행
+### 2. Run Development Server
 
 ```bash
-yarn dev
-# 또는
 npm run dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+Visit `http://localhost:4321` to see your blog.
 
-## 🏗 Notion 데이터베이스 설정
+### 3. Configure GitHub Pages
 
-블로그가 제대로 작동하려면 Notion 데이터베이스에 다음 속성들이 필요합니다:
+1. Go to your repository settings on GitHub
+2. Navigate to **Pages** section
+3. Under **Source**, select **GitHub Actions**
+4. The site will auto-deploy on every push to `main`
 
-### 필수 속성
+### 4. Set Up Decap CMS (Optional but Recommended)
 
-- **Title** (제목): `Title` - 텍스트 타입
-- **Published** (발행): `Published` - 체크박스 타입
-- **Created Time** (생성 시간): 자동 생성 또는 날짜 타입
+To enable the web-based CMS editor at `/admin`:
 
-### 선택적 속성
+#### Option A: Using Netlify Identity (Recommended)
 
-- **Description** (설명): `Description` - 텍스트 타입
-- **Slug** (슬러그): `Slug` - 텍스트 타입 (없으면 페이지 ID 사용)
-- **Cover** (커버 이미지): `Cover` - 파일 타입
-- **Tags** (태그): `Tags` - 다중 선택 타입
-- **Author** (작성자): `Author` - 텍스트 타입
+1. Sign up for a free [Netlify](https://www.netlify.com/) account
+2. Create a new site (you can use it just for authentication)
+3. Go to **Site Settings** → **Identity** → **Enable Identity**
+4. Under **Identity** → **Settings**:
+   - Enable **Git Gateway**
+   - Set registration to **Invite only** (for security)
+5. Update `public/admin/config.yml` if needed (current config uses git-gateway)
+6. Invite yourself via Netlify Identity dashboard
+7. Visit `https://yourusername.github.io/admin` to access the CMS
 
-**참고**: 현재 구현에서는 포스트의 슬러그로 페이지 ID를 기본값으로 사용합니다.
+#### Option B: GitHub OAuth (Advanced)
 
-## 🚀 배포
+1. Go to GitHub Settings → Developer Settings → OAuth Apps
+2. Create a new OAuth App:
+   - Homepage URL: `https://yourusername.github.io`
+   - Authorization callback: `https://api.netlify.com/auth/done`
+3. Update `public/admin/config.yml` with your OAuth credentials
 
-### GitHub Pages 배포 (자동)
+### 5. Customize for Your Site
 
-1. GitHub 저장소의 Settings > Pages에서 소스를 "GitHub Actions"로 설정
-2. `.github/workflows/deploy.yml` 파일이 자동으로 배포를 처리합니다
-3. `main` 브랜치에 푸시하면 자동으로 배포됩니다
-4. GitHub Secrets에 다음 환경 변수들을 설정하세요:
-   - `NOTION_TOKEN`
-   - `NOTION_DATABASE_ID`
-   - `NEXT_PUBLIC_SITE_URL`
-   - `NEXT_PUBLIC_SITE_NAME`
-   - `NEXT_PUBLIC_SITE_DESCRIPTION`
-   - (선택) `NOTION_AUTH_TOKEN`
-   - (선택) `NOTION_USER`
+Update these files with your information:
 
-### 수동 배포
+- `astro.config.mjs`: Change `site` to your GitHub Pages URL
+- `src/components/BaseHead.astro`: Update site name and social handles
+- `src/components/Footer.astro`: Update links and copyright
+- `src/pages/index.astro`: Customize hero section and about text
+- `public/admin/config.yml`: Adjust CMS configuration if needed
+- `public/robots.txt`: Update sitemap URL
+
+## 📝 Writing Posts
+
+### Via Decap CMS (Web UI)
+
+1. Visit `https://yourusername.github.io/admin`
+2. Log in with Netlify Identity
+3. Click "New Post"
+4. Fill in the fields and write your content
+5. Click "Publish" - it will auto-commit to your repo
+
+### Via Markdown Files
+
+1. Create a new `.md` file in `src/content/posts/`
+2. Add frontmatter:
+
+```markdown
+---
+title: "Your Post Title"
+description: "A brief description of your post"
+date: 2026-01-07
+category: backend
+tags:
+  - kotlin
+  - spring-boot
+draft: false
+featured: false
+author: 0xmiles
+---
+
+# Your Content Here
+
+Write your post content in Markdown...
+```
+
+3. Commit and push to GitHub
+4. GitHub Actions will automatically build and deploy
+
+## 📊 Content Schema
+
+Each post supports these frontmatter fields:
+
+| Field          | Type    | Required | Description                                                      |
+| -------------- | ------- | -------- | ---------------------------------------------------------------- |
+| `title`        | string  | ✅       | Post title                                                       |
+| `description`  | string  | ✅       | SEO description                                                  |
+| `date`         | date    | ✅       | Publication date                                                 |
+| `updated`      | date    | ❌       | Last updated date                                                |
+| `category`     | enum    | ✅       | One of: web, backend, devops, database, algorithms, architecture |
+| `tags`         | array   | ✅       | Post tags (min 1)                                                |
+| `draft`        | boolean | ✅       | If true, post won't be published                                 |
+| `featured`     | boolean | ✅       | Show in featured section                                         |
+| `image`        | string  | ❌       | Cover image URL                                                  |
+| `imageAlt`     | string  | ❌       | Image alt text                                                   |
+| `author`       | string  | ✅       | Author name (default: 0xmiles)                                   |
+| `canonicalUrl` | string  | ❌       | Canonical URL if cross-posted                                    |
+
+## 🎨 Customization
+
+### Adding New Categories
+
+1. Update `src/content/config.ts`:
+
+```typescript
+category: z.enum(['web', 'backend', 'devops', 'database', 'algorithms', 'architecture', 'yournewcategory']),
+```
+
+2. Add color in `src/utils/seo.ts`:
+
+```typescript
+const colors: Record<string, string> = {
+  // ... existing colors
+  yournewcategory:
+    "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+};
+```
+
+3. Update `public/admin/config.yml`:
+
+```yaml
+options:
+  [
+    "web",
+    "backend",
+    "devops",
+    "database",
+    "algorithms",
+    "architecture",
+    "yournewcategory",
+  ]
+```
+
+### Styling
+
+- Global styles: `src/styles/global.css`
+- Tailwind config: `tailwind.config.mjs`
+- Component-specific styles: Inline in `.astro` files
+
+### Adding Images
+
+1. Place images in `public/images/` or `public/images/posts/`
+2. Reference in posts: `/images/your-image.jpg`
+3. Images upload automatically when using Decap CMS
+
+## 🚀 Deployment
+
+### Automatic Deployment
+
+Push to `main` branch and GitHub Actions will:
+
+1. Install dependencies
+2. Run Astro build
+3. Deploy to GitHub Pages
+
+### Manual Deployment
 
 ```bash
-yarn build
-yarn export
-# 또는
 npm run build
-npm run export
+# Output will be in ./dist/
 ```
 
-**참고**: Next.js 14에서는 `next.config.js`에서 `output: 'export'` 설정이 되어 있어, `yarn build` 실행 시 자동으로 정적 파일이 `out` 디렉토리에 생성됩니다.
+## 📈 SEO Features
 
-## 📁 프로젝트 구조
+### Implemented
 
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── blog/              # 블로그 관련 페이지
-│   │   └── [slug]/       # 개별 포스트 페이지
-│   ├── about/             # 소개 페이지
-│   ├── globals.css        # 글로벌 스타일
-│   ├── layout.tsx         # 루트 레이아웃
-│   ├── page.tsx           # 홈페이지
-│   ├── not-found.tsx      # 404 페이지
-│   ├── robots.ts          # robots.txt (동적 생성)
-│   └── sitemap.ts         # 사이트맵 (동적 생성)
-├── components/            # 재사용 가능한 컴포넌트
-│   ├── blog/             # 블로그 관련 컴포넌트
-│   │   ├── BlogCard.tsx  # 포스트 카드
-│   │   ├── Hero.tsx      # 히어로 섹션
-│   │   ├── NotionRenderer.tsx  # Notion 콘텐츠 렌더러
-│   │   ├── SearchBar.tsx # 검색 바
-│   │   └── TagFilter.tsx # 태그 필터
-│   ├── layout/           # 레이아웃 컴포넌트
-│   │   ├── Header.tsx    # 헤더
-│   │   └── Footer.tsx    # 푸터
-│   ├── providers/        # 컨텍스트 프로바이더
-│   │   └── ThemeProvider.tsx  # 다크모드 테마 프로바이더
-│   └── about/            # 소개 페이지 컴포넌트
-│       └── ProjectCard.tsx
-├── lib/                   # 유틸리티 함수
-│   └── notion.ts         # Notion API 연동 (CRUD)
-└── types/                 # TypeScript 타입 정의
-    └── blog.ts           # 블로그 관련 타입
-```
+- ✅ Semantic HTML5
+- ✅ Meta tags (title, description, keywords)
+- ✅ Open Graph protocol
+- ✅ Twitter Cards
+- ✅ JSON-LD structured data (BlogPosting schema)
+- ✅ Sitemap.xml (auto-generated)
+- ✅ RSS feed at `/rss.xml`
+- ✅ Robots.txt
+- ✅ Canonical URLs
+- ✅ Alt text for images
+- ✅ Fast loading (static HTML, minimal JS)
+- ✅ Mobile-responsive
+- ✅ Dark mode support
 
-## 🎨 커스터마이징
+### Monitoring
 
-### 색상 테마 변경
+Use these tools to monitor SEO:
 
-`tailwind.config.js`에서 색상 팔레트를 수정할 수 있습니다:
+- [Google Search Console](https://search.google.com/search-console)
+- [PageSpeed Insights](https://pagespeed.web.dev/)
+- [Schema.org Validator](https://validator.schema.org/)
 
-```javascript
-theme: {
-  extend: {
-    colors: {
-      primary: {
-        // 원하는 색상으로 변경
-      }
-    }
-  }
-}
-```
+## 🛡️ Performance
 
-### 폰트 변경
+- **Zero JavaScript by default**: Only UI interactions use minimal JS
+- **Optimized images**: Use WebP format when possible
+- **Static generation**: All pages pre-rendered at build time
+- **CDN delivery**: GitHub Pages uses CDN
+- **Minimal CSS**: Tailwind with PurgeCSS
 
-`src/app/layout.tsx`에서 폰트를 변경할 수 있습니다:
+## 🐛 Troubleshooting
 
-```tsx
-import { Inter } from "next/font/google";
+### CMS Not Loading
 
-const inter = Inter({ subsets: ["latin"] });
-```
+1. Check browser console for errors
+2. Verify Netlify Identity is enabled
+3. Clear browser cache
+4. Check `public/admin/config.yml` syntax
 
-코드 블록 폰트는 `tailwind.config.js`에서 변경할 수 있습니다:
+### Build Failures
 
-```javascript
-fontFamily: {
-  mono: ['JetBrains Mono', 'Consolas', 'monospace'],
-}
-```
+1. Check GitHub Actions logs
+2. Verify all posts have valid frontmatter
+3. Run `npm run build` locally to test
+4. Check for TypeScript errors: `npm run astro check`
 
-## 📝 스크립트
+### Posts Not Showing
 
-- `yarn dev` - 개발 서버 실행 (포트 3000)
-- `yarn build` - 프로덕션 빌드 생성
-- `yarn start` - 프로덕션 서버 실행
-- `yarn export` - 정적 사이트 생성 (`out` 디렉토리)
-- `yarn lint` - ESLint 실행
+1. Verify `draft: false` in frontmatter
+2. Check date is not in the future
+3. Ensure file is in `src/content/posts/`
+4. Validate frontmatter against schema
 
-## 📞 연락처
+## 📚 Tech Stack
 
-- GitHub: [@miles](https://github.com/0xmiles)
+| Technology                                            | Purpose                |
+| ----------------------------------------------------- | ---------------------- |
+| [Astro 4.x](https://astro.build)                      | Static site framework  |
+| [Tailwind CSS](https://tailwindcss.com)               | Utility-first CSS      |
+| [Decap CMS](https://decapcms.org)                     | Git-based headless CMS |
+| [TypeScript](https://www.typescriptlang.org)          | Type safety            |
+| [GitHub Pages](https://pages.github.com)              | Free hosting           |
+| [GitHub Actions](https://github.com/features/actions) | CI/CD                  |
+
+## 📖 Resources
+
+- [Astro Documentation](https://docs.astro.build)
+- [Decap CMS Documentation](https://decapcms.org/docs/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [GitHub Pages Documentation](https://docs.github.com/en/pages)
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🤝 Contributing
+
+Feel free to fork this repository and customize it for your own blog!
+
+## 📧 Contact
+
+- GitHub: [@0xmiles](https://github.com/0xmiles)
+- Twitter: [@0xmiles](https://twitter.com/0xmiles)
+- Blog: [https://0xmiles.github.io](https://0xmiles.github.io)
+
+---
+
+**Happy blogging! 🎉**

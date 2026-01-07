@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://0xmiles.github.io/sitemap-index.xml
+

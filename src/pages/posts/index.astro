@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+
+// Get all published posts
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+// Sort by date (newest first)
+const sortedPosts = allPosts.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+// Get unique categories for filter
+const categories = [...new Set(allPosts.map(post => post.data.category))].sort();
+---
+
+<BaseLayout 
+  title="All Posts | 0xmiles"
+  description="Browse all technical articles and blog posts about software engineering, Spring Boot, Kotlin, and system design."
+>
+  <div class="container-custom py-12">
+    <!-- Header -->
+    <header class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+        All Posts
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400">
+        {sortedPosts.length} {sortedPosts.length === 1 ? 'post' : 'posts'} published
+      </p>
+    </header>
+
+    <!-- Category Filter -->
+    <div class="mb-8 flex flex-wrap gap-2">
+      <a 
+        href="/posts"
+        class="px-4 py-2 rounded-full bg-green-400 text-gray-900 font-medium text-sm no-underline shadow-sm"
+      >
+        All
+      </a>
+      {categories.map((category) => (
+        <a 
+          href={`/category/${category}`}
+          class="px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 font-medium text-sm no-underline transition-colors"
+        >
+          {category.charAt(0).toUpperCase() + category.slice(1)}
+        </a>
+      ))}
+    </div>
+
+    <!-- Posts Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {sortedPosts.map(post => (
+        <PostCard post={post} />
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    {sortedPosts.length === 0 && (
+      <div class="text-center py-16">
+        <p class="text-xl text-gray-600 dark:text-gray-400">
+          No posts found. Check back soon!
+        </p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+

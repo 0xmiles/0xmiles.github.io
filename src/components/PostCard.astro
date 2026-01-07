@@ -1,0 +1,73 @@
+---
+import { formatDate, getCategoryColor, getCategoryLabel } from '../utils/seo';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { title, description, date, category, tags, image } = post.data;
+---
+
+<article class="card card-hover overflow-hidden h-full flex flex-col">
+  <!-- Image -->
+  {image && (
+    <a href={`/posts/${post.slug}`} class="block">
+      <img 
+        src={image} 
+        alt={title}
+        class="w-full h-48 object-cover"
+      />
+    </a>
+  )}
+
+  <div class="p-6 flex flex-col flex-grow">
+    <!-- Category Badge -->
+    <div class="mb-3">
+      <a 
+        href={`/category/${category}`}
+        class={`inline-block px-3 py-1 text-xs font-medium rounded-full ${getCategoryColor(category)} no-underline`}
+      >
+        {getCategoryLabel(category)}
+      </a>
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-xl font-bold mb-2">
+      <a 
+        href={`/posts/${post.slug}`}
+        class="text-gray-900 dark:text-white hover:text-green-500 dark:hover:text-green-300 no-underline"
+      >
+        {title}
+      </a>
+    </h3>
+
+    <!-- Description -->
+    <p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow line-clamp-3">
+      {description}
+    </p>
+
+    <!-- Meta -->
+    <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-500 mt-auto">
+      <time datetime={date.toISOString()}>
+        {formatDate(date)}
+      </time>
+      {tags.length > 0 && (
+        <span class="text-xs">
+          {tags.slice(0, 2).map(tag => `#${tag}`).join(' ')}
+        </span>
+      )}
+    </div>
+  </div>
+</article>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
+
