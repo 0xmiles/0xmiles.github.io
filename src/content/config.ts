@@ -7,7 +7,7 @@ const postsCollection = defineCollection({
     description: z.string(),
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
-    category: z.enum(['web', 'backend', 'devops', 'database', 'algorithms', 'architecture']),
+    category: z.enum(['web', 'backend', 'devops', 'database', 'algorithms', 'architecture', "ai"]),
     tags: z.array(z.string()),
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),

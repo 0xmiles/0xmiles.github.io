@@ -166,9 +166,9 @@ declare module 'astro:content' {
   collection: "posts";
   data: InferEntrySchema<"posts">
 } & { render(): Render[".md"] };
-"welcome-to-my-blog.md": {
-	id: "welcome-to-my-blog.md";
-  slug: "welcome-to-my-blog";
+"프롬프트_엔지니어링_기초.md": {
+	id: "프롬프트_엔지니어링_기초.md";
+  slug: "프롬프트_엔지니어링_기초";
   body: string;
   collection: "posts";
   data: InferEntrySchema<"posts">
