@@ -159,9 +159,9 @@ declare module 'astro:content' {
   collection: "posts";
   data: InferEntrySchema<"posts">
 } & { render(): Render[".md"] };
-"spring-boot-kotlin-best-practices.md": {
-	id: "spring-boot-kotlin-best-practices.md";
-  slug: "spring-boot-kotlin-best-practices";
+"jdbc와_멀티스레드로_대용량_데이터_Bulk_Insert_하기.md": {
+	id: "jdbc와_멀티스레드로_대용량_데이터_Bulk_Insert_하기.md";
+  slug: "jdbc와_멀티스레드로_대용량_데이터_bulk_insert_하기";
   body: string;
   collection: "posts";
   data: InferEntrySchema<"posts">
