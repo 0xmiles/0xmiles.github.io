@@ -152,6 +152,20 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"posts": {
+"API에서만_발생한_detached_entity_passed_to_persist_오류의_원인과_해결.md": {
+	id: "API에서만_발생한_detached_entity_passed_to_persist_오류의_원인과_해결.md";
+  slug: "api에서만_발생한_detached_entity_passed_to_persist_오류의_원인과_해결";
+  body: string;
+  collection: "posts";
+  data: InferEntrySchema<"posts">
+} & { render(): Render[".md"] };
+"JPA_Entity의_JSONB_필드와_영속성_컨텍스트_이슈.md": {
+	id: "JPA_Entity의_JSONB_필드와_영속성_컨텍스트_이슈.md";
+  slug: "jpa_entity의_jsonb_필드와_영속성_컨텍스트_이슈";
+  body: string;
+  collection: "posts";
+  data: InferEntrySchema<"posts">
+} & { render(): Render[".md"] };
 "database-indexing-strategies.md": {
 	id: "database-indexing-strategies.md";
   slug: "database-indexing-strategies";
