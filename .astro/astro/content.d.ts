@@ -159,9 +159,9 @@ declare module 'astro:content' {
   collection: "posts";
   data: InferEntrySchema<"posts">
 } & { render(): Render[".md"] };
-"JPA_Entity의_JSONB_필드와_영속성_컨텍스트_이슈.md": {
-	id: "JPA_Entity의_JSONB_필드와_영속성_컨텍스트_이슈.md";
-  slug: "jpa_entity의_jsonb_필드와_영속성_컨텍스트_이슈";
+"Claude_Code_어디까지_알고_사용하시나요.md": {
+	id: "Claude_Code_어디까지_알고_사용하시나요.md";
+  slug: "claude_code_어디까지_알고_사용하시나요";
   body: string;
   collection: "posts";
   data: InferEntrySchema<"posts">
