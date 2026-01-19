@@ -50,14 +50,6 @@ const readingTime = getReadingTime(content);
           <time datetime={date.toISOString()}>
             {formatDate(date)}
           </time>
-          {updated && (
-            <>
-              <span>•</span>
-              <span>Updated: {formatDate(updated)}</span>
-            </>
-          )}
-          <span>•</span>
-          <span>{readingTime}</span>
         </div>
 
         <!-- Divider -->

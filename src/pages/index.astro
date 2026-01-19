@@ -74,10 +74,6 @@ const recentPosts = sortedPosts.slice(0, 3);
               <time class="text-sm text-gray-500 dark:text-gray-500 min-w-[100px]">
                 {formatDate(post.data.date)}
               </time>
-              <span class="text-sm text-gray-400 dark:text-gray-600">·</span>
-              <span class="text-sm text-gray-500 dark:text-gray-500">
-                {Math.ceil(post.body.split(/\s+/).length / 200)}분
-              </span>
             </div>
             <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors mb-3">
               {post.data.title}
