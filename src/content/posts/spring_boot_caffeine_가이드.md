@@ -1,5 +1,5 @@
 ---
-title: "Spring Boot Caffeine 캐시 가디으 - 설정부터 Window TinyLfu까지"
+title: "Spring Boot Caffeine 캐시 가이드 - 설정부터 Window TinyLfu까지"
 description: "Spring Boot 환경에서 Caffeine 캐시를 도입하는 방법부터 제거 전략, Window TinyLfu 알고리즘의 동작 원리, 그리고 실전 무효화 패턴까지 단계별로 정리합니다."
 date: 2026-01-03
 category: backend
