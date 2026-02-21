@@ -180,9 +180,16 @@ declare module 'astro:content' {
   collection: "posts";
   data: InferEntrySchema<"posts">
 } & { render(): Render[".md"] };
-"jpa-entity-영속성-완벽-가이드-엔티티-생명주기부터-실전-전략까지-2026-01-20.md": {
-	id: "jpa-entity-영속성-완벽-가이드-엔티티-생명주기부터-실전-전략까지-2026-01-20.md";
-  slug: "jpa-entity-영속성-완벽-가이드-엔티티-생명주기부터-실전-전략까지-2026-01-20";
+"jpa-entity-영속성-가이드-엔티티-생명주기부터-실전-전략까지.md": {
+	id: "jpa-entity-영속성-가이드-엔티티-생명주기부터-실전-전략까지.md";
+  slug: "jpa-entity-영속성-가이드-엔티티-생명주기부터-실전-전략까지";
+  body: string;
+  collection: "posts";
+  data: InferEntrySchema<"posts">
+} & { render(): Render[".md"] };
+"spring_boot_caffeine_가이드.md": {
+	id: "spring_boot_caffeine_가이드.md";
+  slug: "spring_boot_caffeine_가이드";
   body: string;
   collection: "posts";
   data: InferEntrySchema<"posts">
